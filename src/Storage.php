@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Bvtterfly\Replay;
 
 use Bvtterfly\Replay\Exceptions\InvalidConfiguration;

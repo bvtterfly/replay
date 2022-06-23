@@ -1,14 +1,16 @@
 <?php
 
+use Bvtterfly\Replay\Contracts\Policy;
 use Bvtterfly\Replay\Replay;
 use Bvtterfly\Replay\Storage;
 use Illuminate\Support\Facades\Route;
-use function Pest\Laravel\get;
+use Mockery\MockInterface;
 use function Pest\Laravel\post;
 
 beforeEach(function () {
     config([
         'replay.use' => 'array',
+        'replay.policy' => Policy::class,
     ]);
 });
 
@@ -17,6 +19,10 @@ afterEach(function () {
 });
 
 it('dont replay if package is disabled', function () {
+    app()->instance(Policy::class, Mockery::mock(Policy::class, function (MockInterface $mock) {
+        $mock->shouldReceive('isIdempotentRequest')->andReturn(true);
+        $mock->shouldReceive('isRecordableResponse')->andReturn(true);
+    }));
     Route::post('resources', function () {
         return 'Created resource id :' . uniqid();
     })->middleware([Replay::class]);
@@ -35,7 +41,11 @@ it('dont replay if package is disabled', function () {
     expect($res)->getContent()->not()->toEqual($res2->getContent());
 });
 
-it('dont replay post requests', function () {
+it('dont replay if  requests is not idempotent', function () {
+    app()->instance(Policy::class, Mockery::mock(Policy::class, function (MockInterface $mock) {
+        $mock->shouldReceive('isIdempotentRequest')->andReturn(false);
+        $mock->shouldReceive('isRecordableResponse')->andReturn(true);
+    }));
     Route::post('resources', function () {
         return 'Created resource id :' . uniqid();
     })->middleware([Replay::class]);
@@ -49,7 +59,11 @@ it('dont replay post requests', function () {
     expect($res)->getContent()->not()->toEqual($res2->getContent());
 });
 
-it('replay idempotency successfully post requests', function () {
+it('replay idempotency requests', function () {
+    app()->instance(Policy::class, Mockery::mock(Policy::class, function (MockInterface $mock) {
+        $mock->shouldReceive('isIdempotentRequest')->andReturn(true);
+        $mock->shouldReceive('isRecordableResponse')->andReturn(true);
+    }));
     Route::post('resources', function () {
         return 'Created resource id :' . uniqid();
     })->middleware([Replay::class]);
@@ -66,24 +80,12 @@ it('replay idempotency successfully post requests', function () {
     expect($res)->getContent()->toEqual($res2->getContent());
 });
 
-it('replay idempotency server errors post requests', function () {
-    Route::post('resources', function () {
-        return response('error '. uniqid(), 500, []);
-    })->middleware([Replay::class]);
 
-    $header = [
-        config('replay.header_name') => uniqid(),
-    ];
-    $res = post('resources', [], $header);
-    $res->assertStatus(500);
-    $res->assertSee('error');
-    $res2 = post('resources', [], $header);
-    $res2->assertStatus(500);
-    $res2->assertSee('error');
-    expect($res)->getContent()->toEqual($res2->getContent());
-});
-
-it('dont replay idempotency client errors post requests', function () {
+it('dont replay if responses is not idempotent.', function () {
+    app()->instance(Policy::class, Mockery::mock(Policy::class, function (MockInterface $mock) {
+        $mock->shouldReceive('isIdempotentRequest')->andReturn(true);
+        $mock->shouldReceive('isRecordableResponse')->andReturn(false);
+    }));
     Route::post('resources', function () {
         return response('error '. uniqid(), 400, []);
     })->middleware([Replay::class]);
@@ -100,24 +102,11 @@ it('dont replay idempotency client errors post requests', function () {
     expect($res)->getContent()->not()->toEqual($res2->getContent());
 });
 
-it('dont replay get requests', function () {
-    Route::get('resources', function () {
-        return response('resources '. uniqid(), 200, []);
-    })->middleware([Replay::class]);
-
-    $header = [
-        config('replay.header_name') => uniqid(),
-    ];
-    $res = get('resources', [], $header);
-    $res->assertStatus(200);
-    $res->assertSee('resources');
-    $res2 = get('resources', [], $header);
-    $res2->assertStatus(200);
-    $res2->assertSee('resources');
-    expect($res)->getContent()->not()->toEqual($res2->getContent());
-});
-
-it('response conflict in progress idempotency post requests', function () {
+it('response conflict in progress idempotency requests', function () {
+    app()->instance(Policy::class, Mockery::mock(Policy::class, function (MockInterface $mock) {
+        $mock->shouldReceive('isIdempotentRequest')->andReturn(true)->twice();
+        $mock->shouldNotReceive('isIdempotentRequest');
+    }));
     Route::post('resources', function () {
         return 'Created resource id :' . uniqid();
     })->middleware([Replay::class]);

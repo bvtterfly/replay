@@ -1,5 +1,7 @@
 <?php
 
+use Bvtterfly\Replay\StripePolicy;
+
 return [
 
     /*
@@ -54,5 +56,17 @@ return [
     */
 
     'header_name' => 'Idempotency-Key',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Policy
+    |--------------------------------------------------------------------------
+    |
+    | The policy determines whether a request is idempotent and whether the response should
+    |  be recorded.
+    |
+    */
+
+    'policy' => StripePolicy::class,
 
 ];

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Bvtterfly\Replay;
 
 use Illuminate\Http\Response;
@@ -9,34 +11,33 @@ class ReplayResponse
 {
     public function __construct(
         public string $key,
-        public string $requestHash,
+        public string $requestSignature,
         public string $body,
         public int $status,
         public ?array $headers = []
     ) {
     }
 
-    public static function fromResponse(string $key, string $requestHash, Response $response): ReplayResponse
+    public static function fromResponse(string $key, string $requestSignature, Response $response): ReplayResponse
     {
         return new self(
             $key,
-            $requestHash,
+            $requestSignature,
             (string) $response->getContent(),
             $response->getStatusCode(),
             $response->headers->all()
         );
     }
 
-    public function toResponse(string $requestHash): Response
+    public function toResponse(string $requestSignature): Response
     {
-        if ($requestHash !== $this->requestHash) {
-            abort(
-                StatusCode::HTTP_CONFLICT,
-                'There was a mismatch between this request\'s parameters and the ' .
-                        'parameters of a previously stored request with the same ' .
-                        'Idempotency-Key.'
-            );
-        }
+        abort_if(
+            $requestSignature !== $this->requestSignature,
+            StatusCode::HTTP_CONFLICT,
+            'There was a mismatch between this request\'s parameters and the ' .
+            'parameters of a previously stored request with the same ' .
+            'Idempotency-Key.'
+        );
 
         return response($this->body, $this->status, $this->headers);
     }

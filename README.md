@@ -18,7 +18,7 @@ Implementation inspired by [Stripe API](https://stripe.com/docs/api/idempotent_r
 - Works only for `POST` requests. Other endpoints are ignored.
 - Record and replay only successful(2xx) and server-side errors(5xx) responses, without touching your controller again.
 - it's safe to retry, it doesn't record the response with client-side errors (4xx).
-- To prevent accidental misuse of the cached responses, the request's hash-key is validated to ensure that the cached response is returned using the same combination of Idempotency-Key and Request.
+- To prevent accidental misuse of the cached responses, the request's signature is validated to ensure that the cached response is returned using the same combination of Idempotency-Key and Request.
 - Concurrency protection using Laravel's atomic locks to prevent race conditions.
 
 ## Installation
@@ -38,6 +38,8 @@ php artisan vendor:publish --tag="replay-config"
 This is the contents of the published config file:
 
 ```php
+use Bvtterfly\Replay\StripePolicy;
+
 return [
 
     /*
@@ -93,6 +95,18 @@ return [
 
     'header_name' => 'Idempotency-Key',
 
+    /*
+    |--------------------------------------------------------------------------
+    | Policy
+    |--------------------------------------------------------------------------
+    |
+    | The policy determines whether a request is idempotent and whether the response should
+    |  be recorded.
+    |
+    */
+
+    'policy' => StripePolicy::class,
+
 ];
 ```
 
@@ -113,6 +127,27 @@ Route::post('/payments', function () {
     //
 })->middleware('replay');
 ```
+
+
+### Custom Policy
+
+Reply use Policy to determine whether a request is idempotent and whether the response should be recorded. By default, Reply includes and uses `StripePolicy` Policy.
+To create your custom policy, you first need to implement the `\Butterfly\Replay\Contracts\Policy` contract:
+
+```php
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+
+interface Policy
+{
+    public function isIdempotentRequest(Request $request): bool;
+
+    public function isRecordableResponse(Response $response): bool;
+}
+```
+If you want to view an example implementation take a look at the `StripePolicy` class.
+
+For using this policy, We can change the `policy` in the config file.
 
 ## ✨ Client Usage
 

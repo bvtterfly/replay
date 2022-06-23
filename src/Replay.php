@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Bvtterfly\Replay;
 
+use Bvtterfly\Replay\Contracts\Policy;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -9,24 +12,27 @@ use Symfony\Component\HttpFoundation\Response as StatusCode;
 
 class Replay
 {
+    private Policy $policy;
+
+    public function __construct()
+    {
+        $this->policy = app()->make(config('replay.policy'));
+    }
+
     public function handle(Request $request, Closure $next): Response
     {
         if (! config('replay.enabled')) {
             return $next($request);
         }
 
-        if (! $request->isMethod('POST')) {
+        if (! $this->policy->isIdempotentRequest($request)) {
             return $next($request);
         }
 
-        if (! ($key = $this->getIdempotencyKey($request))) {
-            return $next($request);
-        }
+        $key = $this->getIdempotencyKey($request);
 
         if ($recordedResponse = ReplayResponse::find($key)) {
-            return $recordedResponse->toResponse(
-                $this->hashRequestParams($request)
-            );
+            return $recordedResponse->toResponse(RequestHelper::signature($request));
         }
         $lock = Storage::lock($key);
 
@@ -36,8 +42,8 @@ class Replay
 
         try {
             $response = $next($request);
-            if ($this->isResponseRecordable($response)) {
-                ReplayResponse::save($key, $this->hashRequestParams($request), $response);
+            if ($this->policy->isRecordableResponse($response)) {
+                ReplayResponse::save($key, RequestHelper::signature($request), $response);
             }
 
             return $response;
@@ -46,34 +52,8 @@ class Replay
         }
     }
 
-    private function getIdempotencyKey(Request $request): string|null
+    private function getIdempotencyKey(Request $request): string
     {
         return $request->header(config('replay.header_name'));
-    }
-
-    protected function hashRequestParams(Request $request): string
-    {
-        $params = json_encode(
-            [
-                $request->ip(),
-                $request->path(),
-                $request->all(),
-                $request->headers->all(),
-            ]
-        );
-
-        $hashAlgo = 'md5';
-
-        if (in_array('xxh3', hash_algos())) {
-            $hashAlgo = 'xxh3';
-        }
-
-        return hash($hashAlgo,   $params);
-    }
-
-    protected function isResponseRecordable(Response $response): bool
-    {
-        return $response->isSuccessful()
-               || $response->isServerError();
     }
 }
