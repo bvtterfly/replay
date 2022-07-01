@@ -110,6 +110,12 @@ return [
 ];
 ```
 
+Optionally, you can publish the translations using
+
+```bash
+php artisan vendor:publish --tag="replay-translations"
+```
+
 ## ✨ Server Usage
 
 The `Bvtterfly\Replay\Replay`-middleware must be registered in the kernel:
@@ -154,9 +160,11 @@ For using this policy, We can change the `policy` in the config file.
 To perform an idempotent request, Client must provide an additional `Idempotency-Key : <key>` header with a unique key to the request.
 
 it is recommended to:
-- Use "V4 UUIDs" for the creation of the idempotency unique keys (e.g. “07cd2d27-e0dc-466f-8193-28453e9c3023”).
+- Use "V4 UUIDs" for the creation of the idempotency unique keys (e.g. `07cd2d27-e0dc-466f-8193-28453e9c3023`).
 
 Once Replay detects a key, it'll look it up in cache store. If found, it will serve the same response without hitting your controller action again.
+
+If Replay can't find the key, it attempts to acquire a cache lock and caches successful or server error responses. Still, if it can't acquire the lock, another request with the same key is already in progress, then it will respond with the HTTP Conflict response status code.
 
 ## 🧪 Testing
 
