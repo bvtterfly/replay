@@ -37,7 +37,7 @@ class Replay
         $lock = Storage::lock($key);
 
         if (! $lock->get()) {
-            abort(StatusCode::HTTP_CONFLICT, 'An API request with the same Idempotency-Key is already in progress.');
+            abort(StatusCode::HTTP_CONFLICT, __('replay::responses.error_messages.already_in_progress'));
         }
 
         try {

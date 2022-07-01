@@ -18,6 +18,7 @@ class ReplayServiceProvider extends PackageServiceProvider
          */
         $package
             ->name('replay')
+            ->hasTranslations()
             ->hasConfigFile();
     }
 }

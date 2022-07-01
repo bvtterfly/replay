@@ -34,9 +34,7 @@ class ReplayResponse
         abort_if(
             $requestSignature !== $this->requestSignature,
             StatusCode::HTTP_CONFLICT,
-            'There was a mismatch between this request\'s parameters and the ' .
-            'parameters of a previously stored request with the same ' .
-            'Idempotency-Key.'
+            __('replay::responses.error_messages.mismatch')
         );
 
         return response($this->body, $this->status, $this->headers);
