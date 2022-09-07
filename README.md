@@ -138,7 +138,7 @@ Route::post('/payments', function () {
 ### Custom Policy
 
 Reply use Policy to determine whether a request is idempotent and whether the response should be recorded. By default, Reply includes and uses `StripePolicy` Policy.
-To create your custom policy, you first need to implement the `\Butterfly\Replay\Contracts\Policy` contract:
+To create your custom policy, you first need to implement the `\Bvtterfly\Replay\Contracts\Policy` contract:
 
 ```php
 use Illuminate\Http\Request;
