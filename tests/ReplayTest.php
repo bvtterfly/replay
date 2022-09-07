@@ -5,6 +5,7 @@ use Bvtterfly\Replay\Replay;
 use Bvtterfly\Replay\Storage;
 use Illuminate\Support\Facades\Route;
 use Mockery\MockInterface;
+
 use function Pest\Laravel\post;
 
 beforeEach(function () {
