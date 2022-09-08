@@ -4,8 +4,7 @@ declare(strict_types=1);
 
 namespace Bvtterfly\Replay;
 
-use Illuminate\Http\Response;
-use Symfony\Component\HttpFoundation\Response as StatusCode;
+use Symfony\Component\HttpFoundation\Response;
 
 class ReplayResponse
 {
@@ -33,7 +32,7 @@ class ReplayResponse
     {
         abort_if(
             $requestSignature !== $this->requestSignature,
-            StatusCode::HTTP_CONFLICT,
+            Response::HTTP_CONFLICT,
             __('replay::responses.error_messages.mismatch')
         );
 
