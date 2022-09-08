@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bvtterfly\Replay;
 
+use Bvtterfly\Replay\Contracts\Policy;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -20,5 +21,10 @@ class ReplayServiceProvider extends PackageServiceProvider
             ->name('replay')
             ->hasTranslations()
             ->hasConfigFile();
+    }
+
+    public function packageRegistered(): void
+    {
+        $this->app->singleton(Policy::class, config('replay.policy'));
     }
 }

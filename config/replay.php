@@ -17,15 +17,15 @@ return [
     |
      */
 
-    'use' => env('REPLY_CACHE_STORE', config('cache.default')),
+    'use' => env('REPLAY_CACHE_STORE', config('cache.default')),
 
     /*
     |--------------------------------------------------------------------------
-    | Reply Master Switch
+    | Replay Master Switch
     |--------------------------------------------------------------------------
     |
-    | Reply is enabled by default,
-    | Use this setting to enable/disable the Reply.
+    | Replay is enabled by default,
+    | Use this setting to enable/disable the Replay.
     |
     */
 
@@ -43,14 +43,14 @@ return [
     |
     */
 
-    'expiration' => 86400,
+    'expiration' => 60 * 60 * 24,
 
     /*
     |--------------------------------------------------------------------------
     | Request Header Name
     |--------------------------------------------------------------------------
     |
-    | Reply will check this header name to determine
+    | Replay will check this header name to determine
     | if a request is an Idempotency request.
     |
     */

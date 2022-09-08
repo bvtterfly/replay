@@ -47,7 +47,7 @@ class ReplayResponse
 
     public static function save(string $key, string $requestHash, Response $response): void
     {
-        $replyResponse = ReplayResponse::fromResponse($key, $requestHash, $response);
-        Storage::put($key, $replyResponse);
+        $replayResponse = ReplayResponse::fromResponse($key, $requestHash, $response);
+        Storage::put($key, $replayResponse);
     }
 }
