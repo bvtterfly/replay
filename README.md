@@ -55,15 +55,15 @@ return [
     |
      */
 
-    'use' => env('REPLY_CACHE_STORE', config('cache.default')),
+    'use' => env('REPLAY_CACHE_STORE', config('cache.default')),
 
     /*
     |--------------------------------------------------------------------------
-    | Reply Master Switch
+    | Replay Master Switch
     |--------------------------------------------------------------------------
     |
-    | Reply is enabled by default,
-    | Use this setting to enable/disable the Reply.
+    | Replay is enabled by default,
+    | Use this setting to enable/disable the Replay.
     |
     */
 
@@ -81,14 +81,14 @@ return [
     |
     */
 
-    'expiration' => 86400,
+    'expiration' => 60 * 60 * 24,
 
     /*
     |--------------------------------------------------------------------------
     | Request Header Name
     |--------------------------------------------------------------------------
     |
-    | Reply will check this header name to determine
+    | Replay will check this header name to determine
     | if a request is an Idempotency request.
     |
     */
@@ -137,7 +137,7 @@ Route::post('/payments', function () {
 
 ### Custom Policy
 
-Reply use Policy to determine whether a request is idempotent and whether the response should be recorded. By default, Reply includes and uses `StripePolicy` Policy.
+Replay use Policy to determine whether a request is idempotent and whether the response should be recorded. By default, Replay includes and uses `StripePolicy` Policy.
 To create your custom policy, you first need to implement the `\Bvtterfly\Replay\Contracts\Policy` contract:
 
 ```php

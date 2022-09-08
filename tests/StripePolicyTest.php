@@ -1,6 +1,5 @@
 <?php
 
-
 use Bvtterfly\Replay\StripePolicy;
 
 it('should return true when request method is post and has Idempotency header', function () {

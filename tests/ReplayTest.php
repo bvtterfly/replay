@@ -5,7 +5,6 @@ use Bvtterfly\Replay\Replay;
 use Bvtterfly\Replay\Storage;
 use Illuminate\Support\Facades\Route;
 use Mockery\MockInterface;
-
 use function Pest\Laravel\post;
 
 beforeEach(function () {
@@ -25,7 +24,7 @@ it('dont replay if package is disabled', function () {
         $mock->shouldReceive('isRecordableResponse')->andReturn(true);
     }));
     Route::post('resources', function () {
-        return 'Created resource id :' . uniqid();
+        return 'Created resource id :'.uniqid();
     })->middleware([Replay::class]);
     config([
         'replay.enabled' => false,
@@ -48,7 +47,7 @@ it('dont replay if  requests is not idempotent', function () {
         $mock->shouldReceive('isRecordableResponse')->andReturn(true);
     }));
     Route::post('resources', function () {
-        return 'Created resource id :' . uniqid();
+        return 'Created resource id :'.uniqid();
     })->middleware([Replay::class]);
 
     $res = post('resources', [], []);
@@ -66,7 +65,7 @@ it('replay idempotency requests', function () {
         $mock->shouldReceive('isRecordableResponse')->andReturn(true);
     }));
     Route::post('resources', function () {
-        return 'Created resource id :' . uniqid();
+        return 'Created resource id :'.uniqid();
     })->middleware([Replay::class]);
 
     $header = [
@@ -88,7 +87,7 @@ it('dont replay if responses is not idempotent.', function () {
         $mock->shouldReceive('isRecordableResponse')->andReturn(false);
     }));
     Route::post('resources', function () {
-        return response('error '. uniqid(), 400, []);
+        return response('error '.uniqid(), 400, []);
     })->middleware([Replay::class]);
 
     $header = [
@@ -109,7 +108,7 @@ it('response conflict in progress idempotency requests', function () {
         $mock->shouldNotReceive('isIdempotentRequest');
     }));
     Route::post('resources', function () {
-        return 'Created resource id :' . uniqid();
+        return 'Created resource id :'.uniqid();
     })->middleware([Replay::class]);
     $key = uniqid();
     $key2 = uniqid();
