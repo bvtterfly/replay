@@ -7,8 +7,7 @@ namespace Bvtterfly\Replay;
 use Bvtterfly\Replay\Contracts\Policy;
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Symfony\Component\HttpFoundation\Response as StatusCode;
+use Symfony\Component\HttpFoundation\Response;
 
 class Replay
 {
@@ -35,7 +34,7 @@ class Replay
         $lock = Storage::lock($key);
 
         if (! $lock->get()) {
-            abort(StatusCode::HTTP_CONFLICT, __('replay::responses.error_messages.already_in_progress'));
+            abort(Response::HTTP_CONFLICT, __('replay::responses.error_messages.already_in_progress'));
         }
 
         try {
