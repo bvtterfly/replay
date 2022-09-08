@@ -2,6 +2,10 @@
 
 All notable changes to `replay` will be documented in this file.
 
+## 1.2.0 - 2022-09-08
+
+- Add a header to identify previously executed responses
+
 ## 1.1.3 - 2022-09-08
 
 - Fix Response Type
