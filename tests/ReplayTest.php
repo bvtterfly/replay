@@ -80,6 +80,29 @@ it('replay idempotency requests', function () {
     expect($res)->getContent()->toEqual($res2->getContent());
 });
 
+it('replay middleware with prefix key idempotency requests', function () {
+    app()->instance(Policy::class, Mockery::mock(Policy::class, function (MockInterface $mock) {
+        $mock->shouldReceive('isIdempotentRequest')->andReturn(true);
+        $mock->shouldReceive('isRecordableResponse')->andReturn(true);
+    }));
+    Route::post('resources', function () {
+        return 'Created resource id :'.uniqid();
+    })->middleware([Replay::class.':prefix']);
+
+    $header = [
+        config('replay.header_name') => $key = uniqid(),
+    ];
+    $res = post('resources', [], $header);
+    $res->assertStatus(200);
+    $res->assertSee('Created resource id');
+    $res2 = post('resources', [], $header);
+    $res2->assertStatus(200);
+    $res2->assertSee('Created resource id');
+    $storedResponse = Storage::get("prefix:$key");
+    $res3 = response($storedResponse->body, $storedResponse->status, $storedResponse->headers);
+    expect($res)->getContent()->toEqual($res2->getContent())
+                ->and($res3->getContent())->toEqual($res->getContent());
+});
 
 it('dont replay if responses is not idempotent.', function () {
     app()->instance(Policy::class, Mockery::mock(Policy::class, function (MockInterface $mock) {

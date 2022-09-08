@@ -12,14 +12,12 @@ use Symfony\Component\HttpFoundation\Response as StatusCode;
 
 class Replay
 {
-    private Policy $policy;
-
-    public function __construct()
-    {
-        $this->policy = app()->make(config('replay.policy'));
+    public function __construct(
+        private Policy $policy
+    ) {
     }
 
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next, ?string $cachePrefix = null): Response
     {
         if (! config('replay.enabled')) {
             return $next($request);
@@ -29,7 +27,7 @@ class Replay
             return $next($request);
         }
 
-        $key = $this->getIdempotencyKey($request);
+        $key = $this->getCacheKey($request, $cachePrefix);
 
         if ($recordedResponse = ReplayResponse::find($key)) {
             return $recordedResponse->toResponse(RequestHelper::signature($request));
@@ -50,6 +48,13 @@ class Replay
         } finally {
             $lock->release();
         }
+    }
+
+    private function getCacheKey(Request $request, ?string $prefix = null): string
+    {
+        $idempotencyKey = $this->getIdempotencyKey($request);
+
+        return $prefix ? "$prefix:$idempotencyKey" : $idempotencyKey;
     }
 
     private function getIdempotencyKey(Request $request): string
