@@ -36,7 +36,12 @@ class ReplayResponse
             __('replay::responses.error_messages.mismatch')
         );
 
-        return response($this->body, $this->status, $this->headers);
+        $response = response($this->body, $this->status, $this->headers);
+        if (! blank($configKey = config('replay.replied_header_name'))) {
+            $response->header($configKey, 'true');
+        }
+
+        return $response;
     }
 
     public static function find(string $key): ?ReplayResponse

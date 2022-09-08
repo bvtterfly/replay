@@ -97,6 +97,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Response Header Name
+    |--------------------------------------------------------------------------
+    |
+    | Replay will add this header to previously executed responses
+    | that's being replayed from the server.
+    |
+    | Use null or empty, if you don't need to identify these responses.
+    |
+    */
+    'replied_header_name' => 'Idempotent-Replayed',
+    
+    /*
+    |--------------------------------------------------------------------------
     | Policy
     |--------------------------------------------------------------------------
     |
@@ -167,8 +180,11 @@ To perform an idempotent request, Client must provide an additional `Idempotency
 
 it is recommended to:
 - Use "V4 UUIDs" for the creation of the idempotency unique keys (e.g. `07cd2d27-e0dc-466f-8193-28453e9c3023`).
+- Derive the key from a user-attached object, like the ID of a shopping cart. This provides a relatively straightforward way to protect against double submissions.
 
 Once Replay detects a key, it'll look it up in cache store. If found, it will serve the same response without hitting your controller action again.
+
+To identify a previously executed response that’s being replayed from the server, look for the header `Idempotent-Replayed: true`.
 
 If Replay can't find the key, it attempts to acquire a cache lock and caches successful or server error responses. Still, if it can't acquire the lock, another request with the same key is already in progress, then it will respond with the HTTP Conflict response status code.
 

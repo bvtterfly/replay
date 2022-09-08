@@ -59,6 +59,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Response Header Name
+    |--------------------------------------------------------------------------
+    |
+    | Replay will add this header to previously executed responses
+    | that's being replayed from the server.
+    |
+    | Use null or empty, if you don't need to identify these responses.
+    |
+    */
+    'replied_header_name' => 'Idempotent-Replayed',
+
+    /*
+    |--------------------------------------------------------------------------
     | Policy
     |--------------------------------------------------------------------------
     |
