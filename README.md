@@ -133,7 +133,13 @@ Route::post('/payments', function () {
     //
 })->middleware('replay');
 ```
+By default, Replay stores the idempotent key as a cache key in the cache store, So all routes with replay middleware share the same cache key with an idempotent key. It's Okay to store it this way in most cases, but in some scenarios, we just need to separate them. In these scenarios, we can add a prefix to cache keys using middleware parameters:
 
+```php
+Route::post('/payments', function () {
+//
+})->middleware('replay:payments');
+```
 
 ### Custom Policy
 
