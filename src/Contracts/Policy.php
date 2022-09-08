@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Bvtterfly\Replay\Contracts;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response;
 
 interface Policy
 {

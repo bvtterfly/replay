@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Bvtterfly\Replay;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response;
 
 class StripePolicy implements Contracts\Policy
 {

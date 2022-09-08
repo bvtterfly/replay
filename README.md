@@ -148,7 +148,7 @@ To create your custom policy, you first need to implement the `\Bvtterfly\Replay
 
 ```php
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\Response;
 
 interface Policy
 {
