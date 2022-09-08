@@ -2,6 +2,11 @@
 
 All notable changes to `replay` will be documented in this file.
 
+## 1.1.0 - 2022-09-08
+
+- Add prefix key parameter to Replay middleware
+- Replace PHP CS Fixer with Laravel Pint
+
 ## 1.0.0 - 2022-07-01
 
 - 🥳 Stable first release
