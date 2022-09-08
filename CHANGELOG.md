@@ -2,6 +2,10 @@
 
 All notable changes to `replay` will be documented in this file.
 
+## 1.1.2 - 2022-09-08
+
+- Fix Response Type
+
 ## 1.1.1 - 2022-09-08
 
 - Fix Response Type
