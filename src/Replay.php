@@ -12,7 +12,8 @@ use Symfony\Component\HttpFoundation\Response;
 class Replay
 {
     public function __construct(
-        private Policy $policy
+        private Policy $policy,
+        private Storage $storage,
     ) {
     }
 
@@ -31,7 +32,7 @@ class Replay
         if ($recordedResponse = ReplayResponse::find($key)) {
             return $recordedResponse->toResponse(RequestHelper::signature($request));
         }
-        $lock = Storage::lock($key);
+        $lock = $this->storage->lock($key);
 
         if (! $lock->get()) {
             abort(Response::HTTP_CONFLICT, __('replay::responses.error_messages.already_in_progress'));

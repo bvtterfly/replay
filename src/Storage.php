@@ -10,58 +10,66 @@ use Illuminate\Cache\TaggedCache;
 use Illuminate\Contracts\Cache\Lock;
 use Illuminate\Contracts\Cache\LockProvider;
 use Illuminate\Contracts\Cache\Repository;
-use Illuminate\Support\Facades\Cache;
 
 class Storage
 {
-    public static function get(string $key): ?ReplayResponse
-    {
-        return self::tagged()->get(self::getCacheKey($key));
+    private TaggedCache $taggedCache;
+
+    private LockProvider $lockProvider;
+
+    public function __construct(
+        private Repository $cache,
+    ) {
+        $this->taggedCache = $this->tagged();
+        $this->lockProvider = $this->lockProvider();
     }
 
-    public static function put(string $key, ReplayResponse $response): void
+    public function get(string $key): ?ReplayResponse
     {
-        self::tagged()->put(self::getCacheKey($key), $response, config('replay.expiration'));
+        return $this->taggedCache->get($this->getCacheKey($key));
     }
 
-    public static function lock(string $key): Lock
+    public function put(string $key, ReplayResponse $response): void
     {
-        $repository = self::store();
-        $lockStore = $repository->getStore();
-        if (! $lockStore instanceof LockProvider) {
+        $this->taggedCache->put($this->getCacheKey($key), $response, config('replay.expiration'));
+    }
+
+    public function lock(string $key): Lock
+    {
+        return $this->lockProvider->lock(self::getLockKey($key));
+    }
+
+    public function flush(): bool
+    {
+        return $this->taggedCache->flush();
+    }
+
+    protected function lockProvider(): LockProvider
+    {
+        $lockProvider = $this->cache->getStore();
+        if (! $lockProvider instanceof LockProvider) {
             throw InvalidConfiguration::notALockProvider(config('replay.use'));
         }
 
-        return $lockStore->lock(self::getLockKey($key));
+        return $lockProvider;
     }
 
-    public static function flush(): void
+    protected function tagged(): TaggedCache
     {
-        self::tagged()->flush();
-    }
-
-    protected static function store(): Repository
-    {
-        return Cache::store(config('replay.use'));
-    }
-
-    protected static function tagged(): TaggedCache
-    {
-        $repository = self::store();
-        if (! $repository->getStore() instanceof TaggableStore) {
+        if (! $this->cache->getStore() instanceof TaggableStore) {
             throw InvalidConfiguration::notATaggableStore(config('replay.use'));
         }
 
-        return $repository->tags('idempotency_requests');
+        return $this->cache->tags('idempotency_requests');
     }
 
-    protected static function getCacheKey(string $key): string
+    protected function getCacheKey(string $key): string
     {
         return trim($key);
     }
 
-    protected static function getLockKey(string $key): string
+    protected function getLockKey(string $key): string
     {
-        return 'l:'.static::getCacheKey($key);
+        return 'l:'.$this->getCacheKey($key);
     }
 }

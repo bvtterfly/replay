@@ -122,6 +122,7 @@ return [
 
 ];
 ```
+> **Note:** Replay needs a cache driver that supports [Cache Tags](https://laravel.com/docs/9.x/cache#cache-tags) & [Atomic Locks](https://laravel.com/docs/9.x/cache#atomic-locks) features. Refer to [Laravel's documentation](https://laravel.com/docs/9.x/cache) to see if your driver supports these features.
 
 Optionally, you can publish the translations using
 

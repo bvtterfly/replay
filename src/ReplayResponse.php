@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bvtterfly\Replay;
 
+use Bvtterfly\Replay\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
 
 class ReplayResponse

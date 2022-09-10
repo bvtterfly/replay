@@ -1,8 +1,8 @@
 <?php
 
 use Bvtterfly\Replay\Exceptions\InvalidConfiguration;
+use Bvtterfly\Replay\Facades\Storage;
 use Bvtterfly\Replay\ReplayResponse;
-use Bvtterfly\Replay\Storage;
 use Illuminate\Support\Facades\Cache;
 
 it('must throw an exception if cache store doesn\'t support tagging', function ($store) {
