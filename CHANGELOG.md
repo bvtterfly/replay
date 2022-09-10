@@ -2,6 +2,10 @@
 
 All notable changes to `replay` will be documented in this file.
 
+## 1.3.0 - 2022-09-10
+
+- Add `replay:cache-reset` command
+
 ## 1.2.0 - 2022-09-08
 
 - Add a header to identify previously executed responses
