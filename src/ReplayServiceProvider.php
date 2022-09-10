@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Bvtterfly\Replay;
 
+use Bvtterfly\Replay\Commands\CacheReset;
 use Bvtterfly\Replay\Contracts\Policy;
 use Illuminate\Support\Facades\Cache;
 use Spatie\LaravelPackageTools\Package;
@@ -21,7 +22,10 @@ class ReplayServiceProvider extends PackageServiceProvider
         $package
             ->name('replay')
             ->hasTranslations()
-            ->hasConfigFile();
+            ->hasConfigFile()
+            ->hasCommands(
+                CacheReset::class,
+            );
     }
 
     public function packageRegistered(): void
