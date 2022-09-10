@@ -189,6 +189,16 @@ To identify a previously executed response that’s being replayed from the serv
 
 If Replay can't find the key, it attempts to acquire a cache lock and caches successful or server error responses. Still, if it can't acquire the lock, another request with the same key is already in progress, then it will respond with the HTTP Conflict response status code.
 
+
+## Resetting the Cache
+
+If you need to manually reset the cache for this package, you may use the following artisan command:
+
+```bash
+php artisan replay:cache-reset
+```
+
+
 ## 🧪 Testing
 
 ```bash
